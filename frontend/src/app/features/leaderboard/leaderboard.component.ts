@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { LeaderboardService, LeaderboardEntry, UserRank } from '../../core/services/leaderboard.service';
 import { AuthService } from '../../core/services/auth.service';
+import { AdminService } from '../../core/services/admin.service';
 
 @Component({
   selector: 'app-leaderboard',
@@ -103,7 +103,7 @@ export class LeaderboardComponent implements OnInit {
   constructor(
     private leaderboardService: LeaderboardService,
     private authService: AuthService,
-    private http: HttpClient
+    private adminService: AdminService
   ) {}
 
   ngOnInit(): void {
@@ -126,7 +126,7 @@ export class LeaderboardComponent implements OnInit {
 
   resetUserXP(userId: string): void {
     if (confirm('Reset this user\'s XP to 0?')) {
-      this.http.put(`http://localhost:3000/api/admin/users/${userId}/xp`, { totalXP: 0 })
+      this.adminService.updateUserXP(userId, 0)
         .subscribe(() => {
           this.loadLeaderboard();
           this.loadUserRank();

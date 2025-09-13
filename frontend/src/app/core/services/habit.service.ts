@@ -7,7 +7,7 @@ import { Habit, CreateHabitRequest, CompleteHabitResponse } from '../models/habi
   providedIn: 'root'
 })
 export class HabitService {
-  private apiUrl = 'http://localhost:3000/api/habits';
+  private apiUrl = 'https://habittracker-nsf3.onrender.com/api/habits';
 
   constructor(private http: HttpClient) {}
 

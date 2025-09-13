@@ -32,7 +32,7 @@ export interface HabitGroup {
   providedIn: 'root'
 })
 export class SocialService {
-  private apiUrl = 'http://localhost:3000/api/social';
+  private apiUrl = 'https://habittracker-nsf3.onrender.com/api/social';
 
   constructor(private http: HttpClient) {}
 

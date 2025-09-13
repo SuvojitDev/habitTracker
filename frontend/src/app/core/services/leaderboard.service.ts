@@ -22,7 +22,7 @@ export interface UserRank {
   providedIn: 'root'
 })
 export class LeaderboardService {
-  private apiUrl = 'http://localhost:3000/api/leaderboard';
+  private apiUrl = 'https://habittracker-nsf3.onrender.com/api/leaderboard';
 
   constructor(private http: HttpClient) {}
 

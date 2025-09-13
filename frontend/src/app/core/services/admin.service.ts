@@ -39,7 +39,7 @@ export interface DashboardStats {
   providedIn: 'root'
 })
 export class AdminService {
-  private apiUrl = 'http://localhost:3000/api/admin';
+  private apiUrl = 'https://habittracker-nsf3.onrender.com/api/admin';
   private currentAdminSubject = new BehaviorSubject<any>(null);
   public currentAdmin$ = this.currentAdminSubject.asObservable();
 
@@ -114,6 +114,46 @@ export class AdminService {
 
   getSystemAnalytics(): Observable<any> {
     return this.http.get(`${this.apiUrl}/analytics`);
+  }
+
+  getStats(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/stats`);
+  }
+
+  deleteHabit(habitId: string): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/habits/${habitId}`);
+  }
+
+  deleteInactiveHabits(): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/habits/inactive`);
+  }
+
+  exportHabitsData(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/export/habits`);
+  }
+
+  exportAllData(): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/export/all`, { responseType: 'blob' });
+  }
+
+  resetAllUserXP(): Observable<any> {
+    return this.http.post(`${this.apiUrl}/reset-xp`, {});
+  }
+
+  sendBulkNotification(message: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/notify-all`, { message });
+  }
+
+  toggleMaintenance(): Observable<any> {
+    return this.http.post(`${this.apiUrl}/maintenance`, {});
+  }
+
+  createDailyChallenge(): Observable<any> {
+    return this.http.post(`${this.apiUrl}/challenges/create`, {});
+  }
+
+  createAchievement(data: { name: string; description: string; xpReward: number }): Observable<any> {
+    return this.http.post(`${this.apiUrl}/achievements/create`, data);
   }
 
   private loadAdminFromStorage(): void {

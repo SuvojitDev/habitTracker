@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../../core/services/auth.service';
+import { AdminService } from '../../core/services/admin.service';
 
 @Component({
   selector: 'app-admin-panel',
@@ -329,8 +329,8 @@ export class AdminPanelComponent implements OnInit {
   ];
 
   constructor(
-    private http: HttpClient,
-    private authService: AuthService
+    private authService: AuthService,
+    private adminService: AdminService
   ) {}
 
   ngOnInit(): void {
@@ -347,14 +347,14 @@ export class AdminPanelComponent implements OnInit {
   }
 
   loadStats(): void {
-    this.http.get('http://localhost:3000/api/admin/stats').subscribe(stats => {
+    this.adminService.getStats().subscribe(stats => {
       this.stats = stats;
     });
   }
 
   loadUsers(): void {
     this.loading = true;
-    this.http.get(`http://localhost:3000/api/admin/users?page=${this.currentPage}&search=${this.searchTerm}`)
+    this.adminService.getUsers(this.currentPage, 10, this.searchTerm)
       .subscribe((response: any) => {
         this.users = response.users;
         this.totalPages = response.pagination.pages;
@@ -370,12 +370,12 @@ export class AdminPanelComponent implements OnInit {
   }
 
   updateUserXP(userId: string, totalXP: number): void {
-    this.http.put(`http://localhost:3000/api/admin/users/${userId}/xp`, { totalXP }).subscribe();
+    this.adminService.updateUserXP(userId, totalXP).subscribe();
   }
 
   deleteUser(userId: string): void {
     if (confirm('Delete this user?')) {
-      this.http.delete(`http://localhost:3000/api/admin/users/${userId}`).subscribe(() => {
+      this.adminService.deleteUser(userId).subscribe(() => {
         this.loadUsers();
         this.loadStats();
       });
@@ -384,7 +384,7 @@ export class AdminPanelComponent implements OnInit {
 
   clearAllData(): void {
     if (confirm('⚠️ This will delete ALL user data. Continue?')) {
-      this.http.delete('http://localhost:3000/api/admin/clear-all').subscribe(() => {
+      this.adminService.clearAllData().subscribe(() => {
         this.loadUsers();
         this.loadStats();
       });
@@ -392,14 +392,14 @@ export class AdminPanelComponent implements OnInit {
   }
 
   loadAllHabits(): void {
-    this.http.get<any>('http://localhost:3000/api/admin/habits').subscribe(response => {
+    this.adminService.getHabits().subscribe(response => {
       this.allHabits = response.habits || [];
     });
   }
 
   deleteHabitAdmin(habitId: string): void {
     if (confirm('Delete this habit?')) {
-      this.http.delete(`http://localhost:3000/api/admin/habits/${habitId}`).subscribe(() => {
+      this.adminService.deleteHabit(habitId).subscribe(() => {
         this.loadAllHabits();
       });
     }
@@ -407,14 +407,14 @@ export class AdminPanelComponent implements OnInit {
 
   deleteInactiveHabits(): void {
     if (confirm('Delete all inactive habits?')) {
-      this.http.delete('http://localhost:3000/api/admin/habits/inactive').subscribe(() => {
+      this.adminService.deleteInactiveHabits().subscribe(() => {
         this.loadAllHabits();
       });
     }
   }
 
   exportHabitsData(): void {
-    this.http.get('http://localhost:3000/api/admin/export/habits')
+    this.adminService.exportHabitsData()
       .subscribe(data => {
         const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
         const url = window.URL.createObjectURL(blob);
@@ -427,7 +427,7 @@ export class AdminPanelComponent implements OnInit {
   }
 
   exportAllData(): void {
-    this.http.get('http://localhost:3000/api/admin/export/all', { responseType: 'blob' })
+    this.adminService.exportAllData()
       .subscribe(blob => {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -439,7 +439,7 @@ export class AdminPanelComponent implements OnInit {
 
   resetAllUserXP(): void {
     if (confirm('Reset ALL users XP to 0?')) {
-      this.http.post('http://localhost:3000/api/admin/reset-xp', {}).subscribe(() => {
+      this.adminService.resetAllUserXP().subscribe(() => {
         this.loadUsers();
         this.loadStats();
         alert('All user XP reset successfully!');
@@ -450,14 +450,14 @@ export class AdminPanelComponent implements OnInit {
   sendBulkNotification(): void {
     const message = prompt('Enter notification message:');
     if (message) {
-      this.http.post('http://localhost:3000/api/admin/notify-all', { message }).subscribe(() => {
+      this.adminService.sendBulkNotification(message).subscribe(() => {
         alert('Notification sent to all users!');
       });
     }
   }
 
   toggleMaintenance(): void {
-    this.http.post('http://localhost:3000/api/admin/maintenance', {}).subscribe(() => {
+    this.adminService.toggleMaintenance().subscribe(() => {
       alert('Maintenance mode toggled!');
     });
   }
@@ -471,7 +471,7 @@ export class AdminPanelComponent implements OnInit {
   }
 
   createDailyChallenge(): void {
-    this.http.post('http://localhost:3000/api/admin/challenges/create', {}).subscribe(response => {
+    this.adminService.createDailyChallenge().subscribe(response => {
       alert('New daily challenge created!');
       this.showChallengesModal = false;
     });
@@ -487,7 +487,7 @@ export class AdminPanelComponent implements OnInit {
     const name = prompt('Achievement name:');
     const description = prompt('Achievement description:');
     if (name && description) {
-      this.http.post('http://localhost:3000/api/admin/achievements/create', {
+      this.adminService.createAchievement({
         name, description, xpReward: 50
       }).subscribe(() => {
         alert('Achievement created!');

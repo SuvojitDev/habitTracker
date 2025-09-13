@@ -20,7 +20,7 @@ export interface Challenge {
   providedIn: 'root'
 })
 export class ChallengeService {
-  private apiUrl = 'http://localhost:3000/api/challenges';
+  private apiUrl = 'https://habittracker-nsf3.onrender.com/api/challenges';
 
   constructor(private http: HttpClient) {}
 
